@@ -1,6 +1,7 @@
 <?php
 namespace App\Modules\Movies\Controllers\Site;
 
+use App\Modules\Movies\Models\Movie;
 use Illuminate\Http\Request;
 use HZ\Illuminate\Mongez\Managers\ApiController;
 
@@ -8,12 +9,10 @@ class MoviesController extends ApiController
 {
     /**
      * Repository name
-     * 
+     *
      * @var string
      */
     protected const REPOSITORY_NAME = 'movies';
-
-    
 
     /**
      * {@inheritDoc}
@@ -21,12 +20,15 @@ class MoviesController extends ApiController
     public function index(Request $request)
     {
         $options = [];
+        if ($categoryId = $request->category_id) {
+            $options['category_id'] = $categoryId;
+        }
 
         return $this->success([
             'records' => $this->repository->list($options),
         ]);
     }
-    
+
     /**
      * {@inheritDoc}
      */

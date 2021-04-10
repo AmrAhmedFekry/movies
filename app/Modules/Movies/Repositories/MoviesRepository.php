@@ -6,6 +6,7 @@ use App\Modules\Movies\{
     Resources\Movie as Resource,
     Filters\Movie as Filter
 };
+use App\Modules\Movies\Models\GenreMovie;
 use App\Services\Movies\Movies;
 use HZ\Illuminate\Mongez\{
     Contracts\Repositories\RepositoryInterface,
@@ -174,7 +175,13 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
      */
     protected function filter()
     {
-        //
+        // Filter base on category id
+        if ($categoryId = $this->option('category_id')) {
+            $this->query->whereHas('genre', function($query) use($categoryId){
+                return $query->where('genre_id' ,$categoryId);
+            });
+        }
+        dd($this->query->toSql());
     }
 
     /**
@@ -204,7 +211,7 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
             $movies =  new Movies;
             $data = $movies->fetch(static::METHOD_NAME, $options);
             foreach($data->results as $singleResult) {
-                Model::create([
+                $model = Model::create([
                     'original_language' => $singleResult->original_language,
                     'original_title' => $singleResult->original_title,
                     'backdrop_path' => $singleResult->backdrop_path,
@@ -218,6 +225,12 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
                     'popularity' => $singleResult->popularity,
                     'vote_average' => $singleResult->vote_average,
                 ]);
+                foreach($singleResult->genre_ids as $genreId) {
+                    GenreMovie::create([
+                        'movie_id' => $model->id,
+                        'genre_id' => $genreId
+                    ]);
+                }
             }
         }
     }
