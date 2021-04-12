@@ -39,7 +39,9 @@ class MovieCron extends Command
     public function handle()
     {
         dispatch(new GenreJob());
-        dispatch(new MovieJob());
+        for($page=1; $page <= env('MOVIE_API_PAGES'); $page++) {
+            dispatch(new MovieJob($page));
+        }
         \Log::info("Movie Cron execution!");
         $this->info('Movie:Cron Command is working fine!');
     }

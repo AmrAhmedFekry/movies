@@ -13,14 +13,20 @@ class MovieJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     * Current Job page number
+     *
+     * @var int
+     */
+    protected $pageNumber;
+    /**
      * Create a new job instance.
      *
      * @param int $pageNo
      * @return void
      */
-    public function __construct()
+    public function __construct(int $pageNumber)
     {
-
+        $this->pageNumber = $pageNumber;
     }
 
     /**
@@ -30,8 +36,6 @@ class MovieJob implements ShouldQueue
      */
     public function handle()
     {
-        for($page=1; $page <= env('MOVIE_API_PAGES'); $page++) {
-            repo('movies')->saveFromAPI($page);
-        }
+        repo('movies')->saveFromAPI($this->pageNumber);
     }
 }
