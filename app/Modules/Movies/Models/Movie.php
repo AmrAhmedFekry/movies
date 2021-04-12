@@ -6,8 +6,12 @@ use HZ\Illuminate\Mongez\Managers\Database\mysql\Model;
 
 class Movie extends Model
 {
-    public function genre()
+
+    /**
+     * The genres that belong to the collection.
+     */
+    public function genres()
     {
-        return $this->belongsToMany(Genre::class, 'genre_movie', 'movie_id', 'genre_id', 'original_id');
+        return $this->belongsToMany(Genre::class, 'genre_movie');
     }
 }

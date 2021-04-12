@@ -1,11 +1,13 @@
 <?php
 namespace App\Modules\Movies\Repositories;
 
+use DB;
 use App\Modules\Movies\{
     Models\Movie as Model,
     Resources\Movie as Resource,
     Filters\Movie as Filter
 };
+use Illuminate\Support\Arr;
 use App\Modules\Movies\Models\GenreMovie;
 use App\Services\Movies\Movies;
 use HZ\Illuminate\Mongez\{
@@ -175,13 +177,23 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
      */
     protected function filter()
     {
-        // Filter base on category id
-        if ($categoryId = $this->option('category_id')) {
-            $this->query->whereHas('genre', function($query) use($categoryId){
-                return $query->where('genre_id' ,$categoryId);
+        // By category id
+        if ($categoryId =  $this->option('category_id')) {
+            $this->query->whereHas('genres', function($query) use ($categoryId) {
+                $query->where('genre_id', $categoryId);
             });
         }
-        dd($this->query->toSql());
+
+        // Filter By Popularity
+        if ($popular =  $this->option('popular')) {
+            $this->query->orderBy('popularity', $popular);
+        }
+
+        // Filter By Rating
+        if ($rated =  $this->option('rated')) {
+            $this->query->orderBy('vote_average', $rated);
+        }
+
     }
 
     /**
@@ -203,7 +215,6 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
      */
     public static function saveFromAPI()
     {
-        Model::truncate();
         for($i=1 ;$i <= static::NUMBER_OF_PAGES ;$i++) {
             $options = [
                 'page' => $i
@@ -211,26 +222,22 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
             $movies =  new Movies;
             $data = $movies->fetch(static::METHOD_NAME, $options);
             foreach($data->results as $singleResult) {
-                $model = Model::create([
-                    'original_language' => $singleResult->original_language,
-                    'original_title' => $singleResult->original_title,
-                    'backdrop_path' => $singleResult->backdrop_path,
-                    'overview' => $singleResult->overview,
-                    'release_date' => $singleResult->release_date,
-                    'title' => $singleResult->title,
-                    'vote_count' => $singleResult->vote_count,
-                    'original_id' => $singleResult->id,
-                    'adult' => $singleResult->adult,
-                    'video' => $singleResult->video,
-                    'popularity' => $singleResult->popularity,
-                    'vote_average' => $singleResult->vote_average,
-                ]);
-                foreach($singleResult->genre_ids as $genreId) {
-                    GenreMovie::create([
-                        'movie_id' => $model->id,
-                        'genre_id' => $genreId
+                    $model = Model::updateOrCreate([
+                            'original_id', $singleResult->id
+                        ], [
+                        'original_language' => $singleResult->original_language,
+                        'original_title' => $singleResult->original_title,
+                        'backdrop_path' => $singleResult->backdrop_path,
+                        'overview' => $singleResult->overview,
+                        'release_date' => $singleResult->release_date,
+                        'title' => $singleResult->title,
+                        'vote_count' => $singleResult->vote_count,
+                        'adult' => $singleResult->adult,
+                        'video' => $singleResult->video,
+                        'popularity' => $singleResult->popularity,
+                        'vote_average' => $singleResult->vote_average,
                     ]);
-                }
+                    $model->genres()->sync($singleResult->genre_ids, false);
             }
         }
     }

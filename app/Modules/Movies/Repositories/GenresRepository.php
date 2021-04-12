@@ -1,6 +1,7 @@
 <?php
 namespace App\Modules\Movies\Repositories;
 
+use DB;
 use App\Modules\Movies\{
     Models\Genre as Model,
     Resources\Genre as Resource,
@@ -126,7 +127,7 @@ class GenresRepository extends RepositoryManager implements RepositoryInterface
      *
      * @const bool
      */
-    const PAGINATE = null;
+    const PAGINATE = true;
 
     /**
      * Number of items per page in pagination
@@ -134,7 +135,7 @@ class GenresRepository extends RepositoryManager implements RepositoryInterface
      *
      * @const int|null
      */
-    const ITEMS_PER_PAGE = null;
+    const ITEMS_PER_PAGE = 15;
 
     /**
      * Set any extra data or columns that need more customizations
@@ -190,12 +191,11 @@ class GenresRepository extends RepositoryManager implements RepositoryInterface
      */
     public static function saveFromAPI()
     {
-        Model::truncate();
         $movies =  new Movies;
         $data = $movies->fetch(static::METHOD_NAME);
         foreach($data->genres as $singleResult) {
-            Model::create([
-                'original_id' => $singleResult->id,
+            Model::updateOrCreate([
+                'id' => $singleResult->id,
                 'name' => $singleResult->name,
             ]);
         }

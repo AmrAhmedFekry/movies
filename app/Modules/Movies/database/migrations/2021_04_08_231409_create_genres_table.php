@@ -14,13 +14,9 @@ class CreateGenresTable extends Migration
     public function up()
     {
         Schema::create('genres', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
+            $table->string('name');
             $table->loggers();
-            
-            
-			$table->string('original_id');
-			$table->string('name');
-
         });
     }
 

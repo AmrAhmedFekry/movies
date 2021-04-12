@@ -20,12 +20,22 @@ class MoviesController extends ApiController
     public function index(Request $request)
     {
         $options = [];
+
         if ($categoryId = $request->category_id) {
             $options['category_id'] = $categoryId;
         }
 
+        if ($request->has('page')) {
+            $options ['page'] = (int) $request->page;
+        }
+        if ($request->has('itemsPerPage')) {
+            $options ['itemsPerPage'] = (int) $request->itemsPerPage;
+        }
+
+
         return $this->success([
             'records' => $this->repository->list($options),
+            'paginationInfo' => $this->repository->getPaginateInfo()
         ]);
     }
 
