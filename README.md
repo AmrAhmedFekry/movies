@@ -8,16 +8,17 @@
 
 set this keys in env file
 
-- MOVIE_DB_API_KEY=4eee4da7740ecf6170e16a76786da58a
-
+- MOVIE_DB_API_KEY=YOUR_ACCOUNT_KEY
+- MOVIE_API_PAGES=NUMBER_OF_PAGES
 
 ## To fetch data from api 
 - php artisan Movie:cron
+- php artisan queue:work
 
 ## run server
 - php artisan serve
 
 ## api endpoint
 run server to use endpoint
-- /api/v1/genres
+- /api/genres
 - /api/movies

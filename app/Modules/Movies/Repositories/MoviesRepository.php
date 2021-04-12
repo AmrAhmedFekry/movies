@@ -104,7 +104,9 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
      *
      * @const array
      */
-    const ORDER_BY = ['original_id', 'DESC'];
+    const ORDER_BY = [
+        'original_id', 'DESC'
+    ];
 
     /**
      * Filter by columns used with `list` method only
@@ -198,7 +200,7 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
         }
 
         // Filter By Rating
-        if ($rated =  $this->option('rated')) {
+        if ($rated = $this->option('rated')) {
             $this->query->orderBy('vote_average', $rated);
         }
 
@@ -219,36 +221,18 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
      * Save bulk data
      *
      * @param array $data
+     * @param int   $pageNumber
      * @return void
      */
-    public static function saveFromAPI()
+    public static function saveFromAPI($pageNumber)
     {
-        DB::table('movies')->delete();
-        for($i=1 ;$i <= static::NUMBER_OF_PAGES ;$i++) {
-            $options = [
-                'page' => $i
-            ];
-            $movies =  new Movies;
-            $data = $movies->fetch(static::METHOD_NAME, $options);
-            foreach($data->results as $singleResult) {
-                    $model = Model::updateOrCreate([
-                        'original_id' => $singleResult->id],
-                        [
-                        'original_language' => $singleResult->original_language,
-                        'original_title' => $singleResult->original_title,
-                        'backdrop_path' => $singleResult->backdrop_path,
-                        'overview' => $singleResult->overview,
-                        'release_date' => $singleResult->release_date,
-                        'title' => $singleResult->title,
-                        'vote_count' => $singleResult->vote_count,
-                        'adult' => $singleResult->adult,
-                        'video' => $singleResult->video,
-                        'popularity' => $singleResult->popularity,
-                        'vote_average' => $singleResult->vote_average]
-                    );
-                    // dd($model->find($singleResult->id));
-                $model->find($singleResult->id)->genres()->sync($singleResult->genre_ids);
-            }
+        $movies =  new Movies;
+        $data = $movies->fetch(static::METHOD_NAME, ['page' => $pageNumber]);
+        foreach($data->results as $singleResult) {
+            $model = Model::updateOrCreate([
+                'original_id' => $singleResult->id
+            ], (array) $singleResult);
+            $model->find($singleResult->id)->genres()->sync($singleResult->genre_ids);
         }
     }
 }

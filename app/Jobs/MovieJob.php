@@ -30,6 +30,8 @@ class MovieJob implements ShouldQueue
      */
     public function handle()
     {
-        repo('movies')->saveFromAPI();
+        for($page=1; $page <= env('MOVIE_API_PAGES'); $page++) {
+            repo('movies')->saveFromAPI($page);
+        }
     }
 }
