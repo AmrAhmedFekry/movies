@@ -223,7 +223,7 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
             $data = $movies->fetch(static::METHOD_NAME, $options);
             foreach($data->results as $singleResult) {
                     $model = Model::updateOrCreate([
-                            'original_id', $singleResult->id
+                        'original_id'=> $singleResult->id
                         ], [
                         'original_language' => $singleResult->original_language,
                         'original_title' => $singleResult->original_title,
