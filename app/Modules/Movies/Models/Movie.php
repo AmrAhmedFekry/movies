@@ -6,7 +6,24 @@ use HZ\Illuminate\Mongez\Managers\Database\mysql\Model;
 
 class Movie extends Model
 {
+    protected $table = 'movies';
 
+    protected $primaryKey = 'original_id';
+
+    protected $fillable = [
+        'original_id',
+        'original_language',
+        'original_title',
+        'backdrop_path',
+        'overview',
+        'release_date',
+        'title',
+        'vote_count',
+        'adult',
+        'video',
+        'popularity',
+        'vote_average'
+    ];
     /**
      * The genres that belong to the collection.
      */

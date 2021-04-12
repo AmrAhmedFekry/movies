@@ -7,9 +7,11 @@ use HZ\Illuminate\Mongez\Managers\Database\mysql\Model;
 class Genre extends Model
 {
 
+    protected $table = 'genres';
+
     protected $fillable = [
         'id',
-        'name',
+        'name'
     ];
 
     /**

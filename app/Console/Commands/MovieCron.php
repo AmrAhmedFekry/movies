@@ -38,8 +38,8 @@ class MovieCron extends Command
      */
     public function handle()
     {
-        dispatch(new MovieJob());
         dispatch(new GenreJob());
+        dispatch(new MovieJob());
         \Log::info("Movie Cron execution!");
         $this->info('Movie:Cron Command is working fine!');
     }

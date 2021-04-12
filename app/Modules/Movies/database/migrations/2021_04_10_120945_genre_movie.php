@@ -17,8 +17,8 @@ class GenreMovie extends Migration
         Schema::create('genre_movie', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->loggers();
-            $table->unsignedBigInteger('movie_id');
-            $table->foreign('movie_id')->references('original_id')->on('movies')->onDelete('cascade');
+            $table->unsignedBigInteger('movie_original_id');
+            $table->foreign('movie_original_id')->references('original_id')->on('movies')->onDelete('cascade');
 
             $table->unsignedBigInteger('genre_id');
             $table->foreign('genre_id')->references('id')->on('genres')->onDelete('cascade');

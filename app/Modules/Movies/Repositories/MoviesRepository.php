@@ -99,6 +99,14 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
     const WHEN_AVAILABLE_DATA = [];
 
     /**
+     * Set the default order by for the repository
+     * i.e ['id', 'DESC']
+     *
+     * @const array
+     */
+    const ORDER_BY = ['original_id', 'DESC'];
+
+    /**
      * Filter by columns used with `list` method only
      *
      * @const array
@@ -215,6 +223,7 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
      */
     public static function saveFromAPI()
     {
+        DB::table('movies')->delete();
         for($i=1 ;$i <= static::NUMBER_OF_PAGES ;$i++) {
             $options = [
                 'page' => $i
@@ -223,8 +232,8 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
             $data = $movies->fetch(static::METHOD_NAME, $options);
             foreach($data->results as $singleResult) {
                     $model = Model::updateOrCreate([
-                        'original_id'=> $singleResult->id
-                        ], [
+                        'original_id' => $singleResult->id],
+                        [
                         'original_language' => $singleResult->original_language,
                         'original_title' => $singleResult->original_title,
                         'backdrop_path' => $singleResult->backdrop_path,
@@ -235,9 +244,10 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
                         'adult' => $singleResult->adult,
                         'video' => $singleResult->video,
                         'popularity' => $singleResult->popularity,
-                        'vote_average' => $singleResult->vote_average,
-                    ]);
-                    $model->genres()->sync($singleResult->genre_ids, false);
+                        'vote_average' => $singleResult->vote_average]
+                    );
+                    // dd($model->find($singleResult->id));
+                $model->find($singleResult->id)->genres()->sync($singleResult->genre_ids);
             }
         }
     }
