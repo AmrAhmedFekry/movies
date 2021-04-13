@@ -220,7 +220,6 @@ class MoviesRepository extends RepositoryManager implements RepositoryInterface
     /**
      * Save bulk data
      *
-     * @param array $data
      * @param int   $pageNumber
      * @return void
      */
